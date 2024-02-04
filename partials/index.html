@@ -17,10 +17,13 @@
             {if $global.path == 'plots'}
             offset: {$offset}
             {/if}
-        {literal}}{/literal}
+            {if $global.path == 'users'}
+            offset: {$offset}
+            {/if}
+            {literal}}{/literal}
     </script>
 </head>
 <body>
-    {include file="$main_content"}
+{include file="$main_content"}
 </body>
 </html>

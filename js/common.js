@@ -124,6 +124,36 @@ let common = {
         });
     },
 
+    //validation
+
+    user_edit_validate(data) {
+
+        const checkEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+        if (data.first_name.trim() === '') {
+            return { valid: false, message: 'Firstname field is required' };
+        }
+
+        if (data.last_name.trim() === '') {
+            return { valid: false, message: 'Lastname field is required' };
+        }
+
+        if (!/\d{5,}/.test(data.phone)) {
+            return { valid: false, message: 'Phone must contain at least five digits' };
+        }
+
+        if (!checkEmail.test(data.email)) {
+            return { valid: false, message: 'Invalid email format' };
+        }
+
+        setTimeout(() => {
+            const message = 'Successfully!';
+            alert(message);
+        }, 500);
+
+        return { valid: true, message: 'Successfully!' };
+    },
+
     // plots
 
     plot_edit_window: (plot_id, e) => {
@@ -153,6 +183,64 @@ let common = {
         let location = {dpt: 'plot', act: 'edit_update'};
         // call
         request({location: location, data: data}, (result) => {
+            common.modal_hide();
+            html('table', result.html);
+        });
+    },
+
+    // users
+
+    user_edit_delete: (user_id, e) => {
+        if (confirm('Are you sure you want to delete the user?')) {
+            // actions
+            cancel_event(e);
+            common.menu_popup_hide_all('all');
+            // vars
+            let data = { user_id: user_id };
+            let location = { dpt: 'user', act: 'edit_delete' };
+            // call
+            request({ location: location, data: data }, (result) => {
+                console.log(result);
+                common.modal_hide();
+                html('table', result.html);
+            });
+        }
+    },
+
+    user_edit_window: (user_id, e) => {
+        // actions
+        cancel_event(e);
+        common.menu_popup_hide_all('all');
+        // vars
+        let data = { user_id: user_id };
+        let location = { dpt: 'user', act: 'edit_window' };
+        // call
+        request({ location: location, data: data }, (result) => {
+            common.modal_show(400, result.html);
+        });
+    },
+
+    user_edit_update (user_id = 0)  {
+        // vars
+        let data = {
+            user_id: user_id,
+            first_name: gv('first_name'),
+            last_name: gv('last_name'),
+            phone: gv('phone'),
+            email: gv('email'),
+            plot_id: gv('plot_id'),
+            offset: global.offset
+        };
+
+        let validStatus = this.user_edit_validate(data);
+        if (!validStatus.valid) {
+            alert(validStatus.message);
+            return;
+        }
+
+        let location = { dpt: 'user', act: 'edit_update' };
+        // call
+        request({ location: location, data: data }, (result) => {
             common.modal_hide();
             html('table', result.html);
         });
